@@ -25,6 +25,10 @@ bot.message(starting_with: "~massmention") do |event|
   end
 end
 
+bot.message(starting_with: "~triggered") do |event|
+  event.respond("http://puu.sh/mSpsT/1cd32bc004.jpg")
+end
+
 bot.message(starting_with: "~masspm") do |event|
   if event.author.permission?(:kick_members, event.server, event.channel)
     event.respond mass_pm(event.channel.users, event.text.sub('~masspm', ''))
