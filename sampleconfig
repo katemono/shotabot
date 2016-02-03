@@ -1,0 +1,7 @@
+{ 
+"user": "account@email", 
+"pass": "account@password",
+"prefix": "bot calling prefix",
+"owner": "owner",
+"owners_site": "ownersite"
+ }
