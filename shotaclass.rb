@@ -85,19 +85,12 @@ def scrapthread(url)
   url = url.chomp.lstrip
   html_doc = Nokogiri::HTML(agent.get(url).body)
   files=[]
-
-  if /:\/\/boards\.4chan\.org/.match(url) do
+  if /:\/\/boards\.4chan\.org/.match(url) 
     (html_doc.css('div.file')).each{ |ito| files.push "https:#{ito.css("a")[0]['href']}"}
-  end
-
-  elsif /:\/\/7chan\.org/.match(url) do
+  elsif /:\/\/7chan\.org/.match(url) 
     (html_doc.css('p.file_size')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
-  end
-
-  elsif /:\/\/boards\.420chan\.org/.match(url) do
+  elsif /:\/\/boards\.420chan\.org/.match(url) 
     (html_doc.css('span.filesize')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
-  end
-
   else 
     (html_doc.css('p.fileinfo')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
   end
@@ -114,6 +107,7 @@ def scrapthread(url)
     end
     files = retarr
   end
+  
   return files
 end
 
@@ -219,8 +213,8 @@ end
 
 def catchallevent(event)
   if $watchedthreads.length > 0
-    for x in $watchedthreads
-      if (Time.now - x["time"]) > 600
+    $watchedthreads.map! do |x|
+      if (Time.now - x["time"]) > 60
         x["thread"] = checkup(x)["thread"]
         x["time"] = Time.now
       end
