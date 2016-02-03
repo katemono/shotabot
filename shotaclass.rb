@@ -4,10 +4,20 @@ require "nokogiri"
 require "open-uri"
 
 $mimicked = []
-
+$watchedthreads = []
 def help(event)
   if event.author.permission?(:kick_members, event.server, event.channel)
-    event.author.pm("admin help")
+    event.author.pm("~mimic @mentionuser
+~danbooru tags
+~cat
+~8ball question?
+~coinflip
+~mrpython
+~staff
+~threaddump chanthreadurl
+~rape @mentionuser
+~masspm what to pm
+~massmention do a mass mention")
   else 
     event.author.pm("user help")
   end
@@ -63,6 +73,90 @@ def z8ball
   "Very doubtful"].sample+"."
 end
 
+def scrapthread(url)
+  agent = Mechanize.new { |agent| agent.user_agent_alias = "Mac Safari" }
+
+  url = url.chomp.lstrip
+  html_doc = Nokogiri::HTML(agent.get(url).body)
+  files=[]
+
+  if /:\/\/boards\.4chan\.org/.match(url) do
+    (html_doc.css('div.file')).each{ |ito| files.push "https:#{ito.css("a")[0]['href']}"}
+  end
+
+  elsif /:\/\/7chan\.org/.match(url) do
+    (html_doc.css('p.file_size')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
+  end
+
+  elsif /:\/\/boards\.420chan\.org/.match(url) do
+    (html_doc.css('span.filesize')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
+  end
+
+  else 
+    (html_doc.css('p.fileinfo')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
+  end
+  
+  retarr = []
+  prefix = (url.split '/')[0..-4].join '/'
+  if prefix.include? "420chan.org" or prefix.include? "8ch.net"
+    for x in files
+      if x.include? "http"
+        retarr.push x
+      else
+        retarr.push("#{prefix}#{x}")
+      end
+    end
+    files = retarr
+  end
+  return files
+end
+
+def watchthread(url, event)
+  thread = {}
+  thread["thread"]=scrapthread(url)
+  thread["time"] = Time.now
+  thread["url"]  = url
+  thread["author"] = event.author
+  message = ""
+  messages = []
+  for x in thread["thread"] do
+    if message.length <= 1000 then
+      message+=x+" " 
+    else
+      messages.push(message)
+      message=x+" "
+    end
+  end
+  messages.push(message) unless messages.include? message
+  messages.each do|x| 
+    event.author.pm(x)
+    sleep 0.1
+  end
+  $watchedthreads.push thread
+end
+
+
+def checkup(author,thread,url)
+  newthread = scrapthread(url)
+  threadx = newthread - thread
+  message = ""
+  messages = []
+  for x in threadx do
+    if message.length <= 1000 then
+      message+=x+" " 
+    else
+      messages.push(message)
+      message=x+" "
+    end
+  end
+  messages.push(message) unless messages.include? message
+  messages.each do|x| 
+    author.pm(x)
+    sleep 0.1
+  end
+  return newthread
+end
+  
 def drop_thread(url)
   agent = Mechanize.new { |agent| agent.user_agent_alias = "Mac Safari" }
 
@@ -88,9 +182,13 @@ def drop_thread(url)
   
   retarr = []
   prefix = (url.split '/')[0..-4].join '/'
-  if prefix.include? "420chan.org"  
+  if prefix.include? "420chan.org"
     for x in files
-      retarr.push("#{prefix}#{x}")
+      if x.include? "http"
+        retarr.push x
+      else
+        retarr.push("#{prefix}#{x}")
+      end
     end
     files = retarr
   end
@@ -110,6 +208,7 @@ def drop_thread(url)
   messages.push(message) unless messages.include? message
   return messages
 end
+
 
 def getrandompythons
   return ((URI.parse('http://tomokochan.me/pythons.txt')).read).split.sample
@@ -160,5 +259,13 @@ def randomCat
 end
 
 def catchallevent(event)
+  if $watchedthreads.length > 0
+    for x in $watchedthreads
+      if (Time.now - x["time"]) > 600
+        x["thread"] = checkup(x["author"],x["thread"], x["url"])
+        x["time"] = Time.now
+      end
+    end
+  end   
   event.send_message event.text if $mimicked.include? event.message.author.id
 end

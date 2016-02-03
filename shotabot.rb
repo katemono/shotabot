@@ -81,8 +81,20 @@ bot.message(starting_with: "~mrpython") do |event|
   event.respond getrandompythons
 end
 
+bot.message(starting_with: "~retard") do |event|
+  event.respond "https://u.pomf.is/hfjsmj.gif"
+end
+
+bot.message(starting_with: "~doit") do |event|
+  event.respond "https://u.pomf.is/bgqhef.gif"
+end
+
 bot.message(starting_with: "~help") do |event|
   help(event)
+end
+
+bot.message(starting_with: "~watchthread") do |event|
+  watchthread(event.text.sub("~watchthread", ''),event)
 end
 
 bot.run
