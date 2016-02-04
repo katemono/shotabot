@@ -214,8 +214,8 @@ end
 def catchallevent(event)
   if $watchedthreads.length > 0
     $watchedthreads.map! do |x|
-      if (Time.now - x["time"]) > 60
-        x["thread"] = checkup(x)["thread"]
+      if (Time.now - x["time"]) > 600
+        x["thread"] = checkup(x)
         x["time"] = Time.now
       end
     end
