@@ -111,16 +111,16 @@ def scrapthread(url)
   return files
 end
 
-def watchthread(event)
-  thread = {}
-  url = event.text.sub("#{$info["prefix"]}watchthread", '')
-  thread["thread"]=scrapthread(url)
-  thread["time"] = Time.now
-  thread["url"]  = url
-  thread["author"] = event.author
-  handlemessages(thread["thread"],event.author,pm = true)
-  $watchedthreads.push thread
-end
+#def watchthread(event,author)
+#  thread = {}
+#  url = event.text.sub("#{$info["prefix"]}watchthread", '')
+#  thread["thread"]=scrapthread(url)
+#  thread["time"] = Time.now
+#  thread["url"]  = url
+#  thread["author"] = author
+#  handlemessages(thread["thread"],event.author,pm = true)
+#  $watchedthreads.push thread
+#end
 
 def handlemessages(items,event,pm = false)
   message = ""
@@ -212,13 +212,17 @@ def randomCat
 end
 
 def catchallevent(event)
-  if $watchedthreads.length > 0
-    $watchedthreads.map! do |x|
-      if (Time.now - x["time"]) > 600
-        x["thread"] = checkup(x)
-        x["time"] = Time.now
-      end
-    end
-  end   
+#  if $watchedthreads.length > 0
+#    $watchedthreads.each do |x|
+#      puts x
+#      if (Time.now - x["time"]) > 60
+#        puts x
+#        x["thread"] = checkup(x)
+#        x["time"] = Time.now
+#        puts x
+#      end
+#    end
+#    puts $watchedthreads
+#  end   
   event.send_message event.text if $mimicked.include? event.message.author.id
 end

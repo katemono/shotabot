@@ -24,10 +24,6 @@ bot.message(starting_with: "#{$info["prefix"]}help") do |event|
   help(event)
 end
 
-bot.message(starting_with: "#{$info["prefix"]}watchthread") do |event|
-  watchthread(event)
-end
-
 bot.message(starting_with: "#{$info["prefix"]}massmention") do |event|
   if event.author.permission?(:kick_members, event.server, event.channel)
     massmention(event)
@@ -80,6 +76,15 @@ bot.message(starting_with: "#{$info["prefix"]}coinflip") do |event|
   event.respond coinflip
 end
 
+bot.message(starting_with: "#{$info["prefix"]}cute") do |event|
+  event.respond "https://u.pomf.is/fqbkom.png"
+end
+
+bot.message(starting_with: "#{$info["prefix"]}love") do |event|
+  event.respond "https://www.youtube.com/watch?v=bI9hgp32-f0"
+end
+
+
 bot.message(starting_with: "#{$info["prefix"]}8ball") do |event|
   event.respond z8ball
 end
@@ -87,5 +92,10 @@ end
 bot.message() do |event|
   catchallevent(event)
 end
+
+
+#bot.message(starting_with: "#{$info["prefix"]}watchthread") do |event|
+  #watchthread(event, event.author)
+#end
 
 bot.run
