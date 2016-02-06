@@ -84,6 +84,9 @@ bot.message(starting_with: "#{$info["prefix"]}love") do |event|
   event.respond "https://www.youtube.com/watch?v=bI9hgp32-f0"
 end
 
+bot.message(starting_with: "#{$info["prefix"]}caps") do |event|
+  event.respond "https://u.pomf.is/rkpzpj.jpg"
+end
 
 bot.message(starting_with: "#{$info["prefix"]}8ball") do |event|
   event.respond z8ball

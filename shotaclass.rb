@@ -12,21 +12,40 @@ def prepare
 end
 
 def help(event)
-  if event.author.permission?(:kick_members, event.server, event.channel)
-    event.author.pm("~mimic @mentionuser
-~danbooru tags
-~cat
-~8ball question?
-~coinflip
-~mrpython
-~staff
-~threaddump chanthreadurl
-~rape @mentionuser
-~masspm what to pm
-~massmention do a mass mention")
-  else 
-    event.author.pm("user help")
+  usercmds = 
+  { 
+  "danbooru"  => "[tags]\n\tReturns random image based on tags from danbooru",
+  "gelbooru"  => "[tags]\n\tReturns random image based on tags from gelbooru",
+  "help"      => "display this message",
+  "8ball"     => "[Question]",
+  "coinflip"  => "[call and statement]",
+  "mrpython"  => "returns random image of a giant penised fellow",
+  "staff"     => "returns a list of all staff",
+  "rape"      => "[@user]\n\trapes @mentioned user",
+  "threaddump"=> "http://chanurl.com/thread\n\tDumps all images from a chan thread",
+  "retard"    => "Displays the image of the retard Sam Hyde",
+  "triggered" => "Displays a very triggered sjw",
+  "doit"      => "Displays a shia lebouf",
+  "cute"      => "Displays a qt showing love",
+  "love"      => "explains love",
+  "caps"      => "what caps mean to you"
+  }
+  staffcmds =
+  {
+  "mimic"       => "[@user]\n\tmimics @mentioned user",
+  "masspm"      => "[message]\n\tpms all users on server",
+  "massmention" => "[message]\n\tindividually mentions every user on server and displays message."
+  }
+  message = ""
+  usercmds.each_pair do |x,y|
+    message+="#{$info["prefix"]}#{x} #{y}\n"
   end
+  if event.author.permission?(:kick_members, event.server, event.channel)
+    staffcmds.each_pair do |x,y|
+      message+="#{$info["prefix"]}#{x} #{y}\n"
+    end
+  end
+  event.author.pm(message)
 end
 
 def coinflip
