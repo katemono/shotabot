@@ -92,6 +92,40 @@ bot.message(starting_with: "#{$info["prefix"]}8ball") do |event|
   event.respond z8ball
 end
 
+bot.message(starting_with: "#{$info["prefix"]}join") do |event|
+  bot.join(event.text.sub("#{$info["prefix"]}join ", ''))
+end
+
+bot.message(starting_with: "#{$info["prefix"]}kick") do |event|
+  event.server.kick(event.message.mentions[0])
+end
+
+bot.message(starting_with: "#{$info["prefix"]}id") do |event|
+  event.respond(event.message.mentions[0].id)
+  event.respond("kicked #{event.message.mentions[0].id}")
+end
+
+bot.message(starting_with: "#{$info["prefix"]}ban") do |event|
+  event.server.ban(event.message.mentions[0], 1)
+  event.respond("banned #{event.message.mentions[0].id}")
+end
+
+bot.message(starting_with: "#{$info["prefix"]}unban") do |event|
+  event.server.unban(event.text.sub("#{$info["prefix"]}unban ", ''))
+end
+
+bot.message(starting_with: "#{$info["prefix"]}avatar") do |event|
+  event.respond event.message.mentions[0].avatar_url
+end
+
+bot.message(starting_with: "#{$info["prefix"]}about") do |event|
+  event.respond "My owner is #{$info["owner"]} their website is #{$info["owners_site"]} you can find my source at https://github.com/katemono/shotabot"
+end
+
+bot.message(containing: "(╯°□°）╯︵ ┻━┻") do |event|
+  event.respond("┬─┬ノ( º _ ºノ) careful with the tables please")
+end
+
 bot.message() do |event|
   catchallevent(event)
 end

@@ -28,10 +28,14 @@ def help(event)
   "doit"      => "Displays a shia lebouf",
   "cute"      => "Displays a qt showing love",
   "love"      => "explains love",
-  "caps"      => "what caps mean to you"
+  "caps"      => "what caps mean to you",
+  "join"      => "invite url",
+  "avatar"    => "@user"
   }
   staffcmds =
   {
+  "kick"        => "[@user]",
+  "ban"         => "[@user]",
   "mimic"       => "[@user]\n\tmimics @mentioned user",
   "masspm"      => "[message]\n\tpms all users on server",
   "massmention" => "[message]\n\tindividually mentions every user on server and displays message."
@@ -220,8 +224,8 @@ def randomGelbooru(event)
 end
 
 def randomDanbooru(event)
-  tag = event.text.sub("#{$info["prefix"]}gelbooru","")
-  url="http://danbooru.donmai.us/posts.json?tags="+((tag.split).join '+~')
+  tag = event.text.sub("#{$info["prefix"]}danbooru","")
+  url="http://danbooru.donmai.us/posts.json?tags=#{((tag.split).join '+~')}"
   event.respond "http://danbooru.donmai.us"+(JSON.parse(((URI.parse(url)).read)).sample["file_url"])
 end
 
