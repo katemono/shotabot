@@ -49,7 +49,8 @@ def help(event)
   "pmmentions" => "your mentions will now be pm-ed to you",
   "lmgtfy" => "googles it for you",
   "avatar"    => "@user",
-  "murderer"  => "@user"
+  "murderer"  => "@user",
+  "throw"     => "@user"
   }
   staffcmds =
   {

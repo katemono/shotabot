@@ -148,8 +148,35 @@ bot.message(starting_with: "#{$info["prefix"]}about") do |event|
   event.respond "My owner is #{$info["owner"]} their website is #{$info["owners_site"]} you can find my source at https://github.com/katemono/shotabot"
 end
 
-bot.message(containing: "(╯°□°）╯︵ ┻━┻") do |event|
+bot.message(containing: ["(╯°□°）╯︵ ┻━┻", "(╯°□°）╯︵ ┻━━┻", "┻━┻︵ノ(°□°ノ）"]) do |event|
   event.respond("┬─┬ノ( º _ ºノ) careful with the tables please")
+end
+
+bot.message(starting_with: "#{$info["prefix"]}throw") do |event|
+  items = [
+  "dildo",
+  "gameboy",
+  "pen",
+  "tv",
+  "xbone",
+  "controller",
+  "burrito",
+  "butt plug",
+  "saiky",
+  "can",
+  "pillow",
+  "trumpet",
+  "guitar"
+  ]
+  event.respond("_throws a #{items.sample} at #{event.message.mentions[0].mention}_")
+end
+
+bot.message(starting_with: "#{$info["prefix"]}cuddle") do |event|
+  event.respond("_picks up saiky and sets them in #{event.message.author.mention}'s lap_")
+end
+
+bot.message(containing: ["┬─┬﻿ ノ( ゜-゜ノ)","┬─┬ノ( º _ ºノ)", "┬───────────────┬﻿ ノ( ゜- ゜ノ)", "┬─────────────┬ ノ(^-^ノ)"]) do |event|
+  event.respond(" (ﾉಥ益ಥ）ﾉ﻿ ┻━━━━━━━━━━━━━━┻ ")
 end
 
 bot.private_message() do |event|
