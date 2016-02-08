@@ -1,1 +1,25 @@
 def user_ban(attributes{}, &block)
+
+Use `help <command> to get more information about a command.
+If you want me to pm you mentions run `pmmentions on
+Use `clean to clean up this bot's messages. (Anyone can use this!)
+
+Commands:
+avatar: avatar, mcavatar
+plugin_commands: loadplugin, listplugin, unloadplugin, reloadplugin
+osu: osu, ppy, mania, taiko, setosu, ctb
+git_info: rev, revision
+star_command: star
+debug_commands: report, uptime, sadlenny, hardmention, userinfo, finddups, exec, find, say, roll, eval, stats, lenny, largestservers, strrole, ding, shrug, roleinfo, serverinfo, channelinfo
+join_server: join
+pm_mentions: pmmentions
+help: info, help
+sandwich: love, bully, hate, lewd, waaaai, nonobully, imgtest2, sandwitch, doot, same, curious, doushio, oven, sparkle, bait, sudoku, nobully, kappaross, wtf, weeb, rekt, justright, imgtest, nosebleed, brows, sandwich, mystery, woop
+sauce: saucenao
+metrics: messages
+charinfo: charinfo
+mod_commands: prune, clean
+role_colors: color, gibcolor
+config_commands: confighelp, get_server, set_channel, set_server, get_channel
+command_listener: as
+last_seen_tracker: names, last_seen

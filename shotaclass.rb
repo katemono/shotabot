@@ -1,14 +1,30 @@
 require 'discordrb'
 require "mechanize"
 require "nokogiri"
+require "uri"
 require "open-uri"
 
 $mimicked = []
+$pmers = []
 $watchedthreads = []
 $info={}
 
 def prepare
   $info = JSON.parse(File.open("config", "r").read)
+end
+
+def pmmentions(event)
+  id = event.message.author.id
+  if $pmers.include? id
+    $pmers-=[id]
+  else
+    $pmers.push(id)
+  end
+end
+
+def imgtfy(event)
+  text = URI.escape(URI.escape(event.text.sub("#{$info["prefix"]}lmgtfy ", '')), "+");
+  event.respond "http://lmgtfy.com/?q=#{text}"
 end
 
 def help(event)
@@ -30,24 +46,27 @@ def help(event)
   "love"      => "explains love",
   "caps"      => "what caps mean to you",
   "join"      => "invite url",
-  "avatar"    => "@user"
+  "pmmentions" => "your mentions will now be pm-ed to you",
+  "lmgtfy" => "googles it for you",
+  "avatar"    => "@user",
+  "murderer"  => "@user"
   }
   staffcmds =
   {
   "kick"        => "[@user]",
   "ban"         => "[@user]",
+  "unban"         => "[@user]",
   "mimic"       => "[@user]\n\tmimics @mentioned user",
   "masspm"      => "[message]\n\tpms all users on server",
   "massmention" => "[message]\n\tindividually mentions every user on server and displays message."
   }
-  message = ""
+  message = "**User Commands:**\n"
   usercmds.each_pair do |x,y|
     message+="#{$info["prefix"]}#{x} #{y}\n"
   end
-  if event.author.permission?(:kick_members, event.server, event.channel)
-    staffcmds.each_pair do |x,y|
-      message+="#{$info["prefix"]}#{x} #{y}\n"
-    end
+  message+="\n**Staff Commands:**\n"
+  staffcmds.each_pair do |x,y|
+    message+="#{$info["prefix"]}#{x} #{y}\n"
   end
   event.author.pm(message)
 end
@@ -71,10 +90,9 @@ def mimic(event)
 end
 
 def returnstaff(event)
-  message = "Staff is:\n"
+  message = "**Staff is:**\n"
   for user in event.channel.users do
-   message+="*ADMIN* " if user.permission?(:manage_server, event.server, event.channel)
-   message+=user.name+"\n" if user.permission?(:kick_members, event.server, event.channel) && user.bot? != true
+   message+="\t- "+user.name+"\n" if user.permission?(:kick_members, event.server, event.channel) && user.bot? != true
   end
   event.send_message(message);
 end
@@ -234,18 +252,11 @@ def randomCat
   return (JSON.parse(((URI.parse(url)).read))["file"])
 end
 
-def catchallevent(event)
-#  if $watchedthreads.length > 0
-#    $watchedthreads.each do |x|
-#      puts x
-#      if (Time.now - x["time"]) > 60
-#        puts x
-#        x["thread"] = checkup(x)
-#        x["time"] = Time.now
-#        puts x
-#      end
-#    end
-#    puts $watchedthreads
-#  end   
+def catchallevent(event,bot)
+
+  event.message.mentions.each do |mention|
+    mention.pm("mentioned by #{event.author.username}:\n #{event.text}") if $pmers.include? mention.id
+    help(event) if mention.id == bot.bot_user.id
+  end
   event.send_message event.text if $mimicked.include? event.message.author.id
 end

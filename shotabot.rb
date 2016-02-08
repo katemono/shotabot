@@ -97,25 +97,51 @@ bot.message(starting_with: "#{$info["prefix"]}join") do |event|
 end
 
 bot.message(starting_with: "#{$info["prefix"]}kick") do |event|
-  event.server.kick(event.message.mentions[0])
+  if event.author.permission?(:kick_members, event.server, event.channel)
+    event.server.kick(event.message.mentions[0])
+    event.respond("kicked #{event.message.mentions[0].id}")
+  else
+    event.respond("You arent allowed to do that! >:c")
+  end
 end
 
 bot.message(starting_with: "#{$info["prefix"]}id") do |event|
   event.respond(event.message.mentions[0].id)
-  event.respond("kicked #{event.message.mentions[0].id}")
-end
-
-bot.message(starting_with: "#{$info["prefix"]}ban") do |event|
-  event.server.ban(event.message.mentions[0], 1)
-  event.respond("banned #{event.message.mentions[0].id}")
 end
 
 bot.message(starting_with: "#{$info["prefix"]}unban") do |event|
-  event.server.unban(event.text.sub("#{$info["prefix"]}unban ", ''))
+  if event.author.permission?(:ban_members, event.server, event.channel)
+    id = ((event.text).sub "#{$info["prefix"]}unban ", "").to_i
+    event.server.unban(bot.user(id))
+    event.respond("unbaned #{id}")
+  else
+    event.respond("You arent allowed to do that! >:c")
+  end
+end
+
+bot.message(starting_with: "#{$info["prefix"]}ban") do |event|
+  if event.author.permission?(:ban_members, event.server, event.channel)
+    event.server.ban(event.message.mentions[0])
+    event.respond("banned #{event.message.mentions[0].id}")
+  else
+    event.respond("You arent allowed to do that! >:c")
+  end
 end
 
 bot.message(starting_with: "#{$info["prefix"]}avatar") do |event|
   event.respond event.message.mentions[0].avatar_url
+end
+
+bot.message(starting_with: "#{$info["prefix"]}pmmentions") do |event|
+  pmmentions(event)
+end
+
+bot.message(starting_with: "#{$info["prefix"]}lmgtfy") do |event|
+  imgtfy(event)
+end
+
+bot.message(starting_with: "#{$info["prefix"]}murderer") do |event|
+  event.send_message("_throws red paint on #{event.message.mentions[0].mention}_ \n https://www.youtube.com/watch?v=2w7TCmJUD7g");
 end
 
 bot.message(starting_with: "#{$info["prefix"]}about") do |event|
@@ -126,8 +152,12 @@ bot.message(containing: "(╯°□°）╯︵ ┻━┻") do |event|
   event.respond("┬─┬ノ( º _ ºノ) careful with the tables please")
 end
 
+bot.private_message() do |event|
+  help(event)
+end
+
 bot.message() do |event|
-  catchallevent(event)
+  catchallevent(event,bot)
 end
 
 
