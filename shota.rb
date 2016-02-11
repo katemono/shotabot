@@ -199,7 +199,9 @@ class Shota
     end
     
     self.bot.message(containing: "boot") do |event|
-      event.respond("https://u.pomf.is/awgpeo.jpg")
+      unless event.channel.id == 110373943822540800
+        event.respond("https://u.pomf.is/awgpeo.jpg")
+      end
     end
 
     self.bot.private_message() do |event|
