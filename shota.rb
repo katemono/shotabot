@@ -6,8 +6,8 @@ require "open-uri"
 require "net/https"
 
 class Shota
-  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads
-  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads
+  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm
+  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm
   
   def initialize(options)
     @info = JSON.parse(File.open("config", "r").read)
@@ -15,6 +15,7 @@ class Shota
     @mimicked = []
     @pmers = []
     @watchedthreads = []
+    @lastpm = 0
   end
   
   def run!
@@ -196,9 +197,16 @@ class Shota
     self.bot.message(containing: ["┬─┬﻿ ノ( ゜-゜ノ)","┬─┬ノ( º _ ºノ)", "┬───────────────┬﻿ ノ( ゜- ゜ノ)", "┬─────────────┬ ノ(^-^ノ)"]) do |event|
       event.respond(" (ﾉಥ益ಥ）ﾉ﻿ ┻━━━━━━━━━━━━━━┻ ")
     end
+    
+    self.bot.message(containing: "boot") do |event|
+      event.respond("https://u.pomf.is/awgpeo.jpg")
+    end
 
     self.bot.private_message() do |event|
-      help(event)
+      unless self.lastpm == event.message.author.id
+        self.lastpm = event.message.author.id
+        help(event)
+      end
     end
 
     self.bot.message() do |event|
