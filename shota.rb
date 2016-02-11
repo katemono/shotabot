@@ -32,7 +32,11 @@ class Shota
     self.bot.message(starting_with: "#{self.info["prefix"]}danbooru") do |event|
       randomDanbooru(event)
     end
-
+    
+    self.bot.message(starting_with: "#{self.info["prefix"]}yandere") do |event|
+      randomYandere(event)
+    end
+    
     self.bot.message(starting_with: "#{self.info["prefix"]}help") do |event|
       help(event)
     end
@@ -67,6 +71,10 @@ class Shota
 
     self.bot.message(starting_with: "#{self.info["prefix"]}triggered") do |event|
       event.respond("http://puu.sh/mSpsT/1cd32bc004.jpg")
+    end
+    
+    self.bot.message(starting_with: "#{self.info["prefix"]}triggered") do |event|
+      event.respond("http://i.imgur.com/wnIaRyJ.gif")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}retard") do |event|
@@ -437,6 +445,12 @@ class Shota
     event.respond (JSON.parse(((URI.parse(url)).read)).sample["file_url"]).sub('\/','/')
   end
 
+  def randomYandere(event)
+    tag= (event.text.sub("#{self.info["prefix"]}yandere","").split).join("+")
+    url="https://yande.re/post.json?limit=200&tags="+tag
+    event.respond JSON.parse((URI.parse(url)).read).sample["file_url"]
+  end
+  
   def randomDanbooru(event)
     tag = event.text.sub("#{self.info["prefix"]}danbooru","")
     url="http://danbooru.donmai.us/posts.json?tags=#{((tag.split).join '+~')}"
