@@ -3,6 +3,7 @@ require "mechanize"
 require "nokogiri"
 require "uri"
 require "open-uri"
+require "net/https"
 
 class Shota
   attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads
@@ -443,13 +444,18 @@ class Shota
     #wont work often due to anonymous user issues
     tag = event.text.sub("#{self.info["prefix"]}gelbooru","")
     url="http://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=20&id=2000000&json=1&tags="+((tag.split).join '+')
-    event.respond (JSON.parse(((URI.parse(url)).read)).sample["file_url"]).sub('\/','/')
+    #event.respond (JSON.parse(((URI.parse(url)).read)).sample["file_url"]).sub('\/','/')
+    #tag= (event.text.sub("#{self.info["prefix"]}yandere","").split).join("+")
+    agent = Mechanize.new { |agent| agent.user_agent_alias = "Mac Safari" }
+    html_doc = agent.get(url)
+    event.respond JSON.parse(html_doc.body).sample["file_url"]
   end
 
   def randomYandere(event)
     tag= (event.text.sub("#{self.info["prefix"]}yandere","").split).join("+")
-    url="https://yande.re/post.json?limit=200&tags="+tag
-    event.respond JSON.parse((URI.parse(url)).read).sample["file_url"]
+    agent = Mechanize.new { |agent| agent.user_agent_alias = "Mac Safari" }
+    html_doc = agent.get("https://yande.re/post.json?limit=200&tags="+tag)
+    event.respond JSON.parse(html_doc.body).sample["file_url"]
   end
   
   def randomDanbooru(event)
