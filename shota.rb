@@ -74,7 +74,7 @@ class Shota
       event.respond("http://puu.sh/mSpsT/1cd32bc004.jpg")
     end
     
-    self.bot.message(starting_with: "#{self.info["prefix"]}triggered") do |event|
+    self.bot.message(starting_with: "#{self.info["prefix"]}triggered.gif") do |event|
       event.respond("http://i.imgur.com/wnIaRyJ.gif")
     end
 
