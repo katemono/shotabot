@@ -470,12 +470,11 @@ class Shota
   end
 
   def catchallevent(event,bot)
-
     event.message.mentions.each do |mention|
       mention.pm("mentioned by #{event.author.username}:\n #{event.text}") if self.pmers.include? mention.id
-      help(event) if mention.id == bot.bot_user.id
     end
     event.send_message event.text if self.mimicked.include? event.message.author.id
+    self.bot.game=self.info["prefix"]+"help for help"
   end
 
 end
