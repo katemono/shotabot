@@ -102,4 +102,14 @@ class Server < Shota
       super
     end
   end
+  
+  def redirect_output
+    FileUtils.mkdir_p(File.dirname(logfile), :mode => 0755)
+    FileUtils.touch logfile
+    File.chmod(0644, logfile)
+    $stderr.reopen(logfile, 'a')
+    $stdout.reopen($stderr)
+    $stdout.sync = $stderr.sync = true
+  end
+  
 end
