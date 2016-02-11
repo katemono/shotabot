@@ -235,6 +235,7 @@ class Shota
     { 
     "danbooru"  => "[tags]\n\tReturns random image based on tags from danbooru",
     "gelbooru"  => "[tags]\n\tReturns random image based on tags from gelbooru",
+    "yandere"  => "[tags]\n\tReturns random image based on tags from yandere",
     "help"      => "display this message",
     "8ball"     => "[Question]",
     "coinflip"  => "[call and statement]",
