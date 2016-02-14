@@ -3,7 +3,7 @@ require "mechanize"
 require "nokogiri"
 require "uri"
 require "open-uri"
-require "net/https"
+#require "net/https"
 
 class Shota
   attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm
@@ -203,7 +203,28 @@ class Shota
         event.respond("https://u.pomf.is/awgpeo.jpg")
       end
     end
-
+    
+    self.bot.message(containing: ["short","shirt"]) do |event|
+      unless event.channel.id == 110373943822540800
+        event.respond("https://u.pomf.is/gzfkxn.jpg")
+      end
+    end
+    
+    self.bot.message(containing: "dad") do |event|
+      unless event.channel.id == 110373943822540800
+        event.respond("Just me and my :two_hearts:daddy:two_hearts:, hanging out I got pretty hungry:eggplant: so I started to pout :disappointed: He asked if I was down :arrow_down:for something yummy :heart_eyes::eggplant: and I asked what and he said he'd give me his :sweat_drops:cummies!:sweat_drops: Yeah! Yeah!:two_hearts::sweat_drops: I drink them!:sweat_drops: I slurp them!:sweat_drops: I swallow them whole:sweat_drops: :heart_eyes: It makes :cupid:daddy:cupid: :blush:happy:blush: so it's my only goal... :two_hearts::sweat_drops::tired_face:Harder daddy! Harder daddy! :tired_face::sweat_drops::two_hearts: 1 cummy:sweat_drops:, 2 cummy:sweat_drops::sweat_drops:, 3 cummy:sweat_drops::sweat_drops::sweat_drops:, 4:sweat_drops::sweat_drops::sweat_drops::sweat_drops: I'm :cupid:daddy's:cupid: :crown:princess :crown:but I'm also a whore! :heart_decoration: He makes me feel squishy:heartpulse:!He makes me feel good:purple_heart:! :cupid::cupid::cupid:He makes me feel everything a little should!~ :cupid::cupid::cupid: :crown::sweat_drops::cupid:Wa-What!:cupid::sweat_drops::crown:")
+      end
+    end
+    
+    #self.bot.message(containing: "lmao") do |event|
+    #  sleep 1
+    #  event.respond("ayy")
+    #end
+    
+    self.bot.message(starting_with: "#{self.info["prefix"]}cummies") do |event|
+      atscummies(event)
+    end
+    
     self.bot.private_message() do |event|
       unless self.lastpm == event.message.author.id
         self.lastpm = event.message.author.id
@@ -259,9 +280,11 @@ class Shota
     "join"      => "invite url",
     "pmmentions" => "your mentions will now be pm-ed to you",
     "lmgtfy" => "googles it for you",
+    "cat"       => "random cat",
     "avatar"    => "@user",
     "murderer"  => "@user",
-    "throw"     => "@user"
+    "throw"     => "@user",
+    "cummies"   => "@user"
     }
     staffcmds =
     {
@@ -425,6 +448,11 @@ class Shota
       sleep 0.1 
     end
     return "Done!"
+  end
+  
+  def atscummies(event)
+    user = event.message.mentions[0].mention
+    event.respond("Just me and my :two_hearts:#{user}:two_hearts:, hanging out I got pretty hungry:eggplant: so I started to pout :disappointed: He asked if I was down :arrow_down:for something yummy :heart_eyes::eggplant: and I asked what and he said he'd give me his :sweat_drops:cummies!:sweat_drops: Yeah! Yeah!:two_hearts::sweat_drops: I drink them!:sweat_drops: I slurp them!:sweat_drops: I swallow them whole:sweat_drops: :heart_eyes: It makes :cupid:#{user}:cupid: :blush:happy:blush: so it's my only goal... :two_hearts::sweat_drops::tired_face:Harder #{user}! Harder #{user}! :tired_face::sweat_drops::two_hearts: 1 cummy:sweat_drops:, 2 cummy:sweat_drops::sweat_drops:, 3 cummy:sweat_drops::sweat_drops::sweat_drops:, 4:sweat_drops::sweat_drops::sweat_drops::sweat_drops: I'm :cupid:#{user}'s:cupid: :crown:princess :crown:but I'm also a whore! :heart_decoration: He makes me feel squishy:heartpulse:!He makes me feel good:purple_heart:! :cupid::cupid::cupid:He makes me feel everything a little should!~ :cupid::cupid::cupid: :crown::sweat_drops::cupid:Wa-What!:cupid::sweat_drops::crown:")
   end
 
   def massmention(event)
