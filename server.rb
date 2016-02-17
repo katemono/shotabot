@@ -99,16 +99,16 @@ class Server < Shota
     end
     Thread.new do
       while true
-        begin
-          puts "here"
+        #begin
+          #puts "here"
           while self.songs.size > 0
             puts "here1"
             song = self.songs.pop
-            self.bot.voice.play_file("./"+song)
+            self.vbot.play_io(open(song))
           end
-        rescue
-          puts "shitmyself"
-        end
+        #rescue
+        #  puts "shitmyself"
+        #end
       end
     end
     Thread.new do

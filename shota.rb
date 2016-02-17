@@ -7,8 +7,8 @@ require "open-uri"
 #require "net/https"
 
 class Shota
-  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack, :songs
-  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack, :songs
+  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack, :songs, :vbot
+  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack, :songs, :vbot
 
   def initialize(options)
     @info = JSON.parse(File.open("config", "r").read)
@@ -18,6 +18,7 @@ class Shota
     @songs = []
     @watchedthreads = []
     @message_stack = []
+    @vbot = nil
     @lastpm = 0
   end
 
@@ -28,7 +29,7 @@ class Shota
   def run!
     self.bot.message(starting_with: "#{self.info["prefix"]}joinchan") do |event|
       event.server.channels.each do |chan|
-        self.bot.voice_connect(chan) if chan.name == event.text.sub("#{self.info["prefix"]}joinchan ", '')
+        self.vbot = self.bot.voice_connect(chan) if chan.name == event.text.sub("#{self.info["prefix"]}joinchan ", '')
       end
     end
 
@@ -41,7 +42,7 @@ class Shota
 
       filename = (YoutubeDL.download event.text.sub("#{self.info["prefix"]}play ", ''), options).filename
       self.songs.push filename
-      puts self.songs 
+      puts self.songs
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}threaddump") do |event|
