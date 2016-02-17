@@ -322,10 +322,10 @@ class Shota
   def mimic(event)
     begin
       id = event.message.mentions[0].id
-      if $mimicked.include? id
-        $mimicked-=[id]
+      if self.mimicked.include? id
+        self.mimicked-=[id]
       else
-        $mimicked.push(id)
+        self.mimicked.push(id)
       end
     rescue
       self.send_messages(event.channel.id, "Please provide valid user in form of @ mention")
