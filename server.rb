@@ -32,7 +32,7 @@ class Server < Shota
   def pidfile?
     !pidfile.nil?
   end
-    
+
   def write_pid
     if pidfile?
       begin
@@ -67,25 +67,25 @@ class Server < Shota
   rescue Errno::EPERM
     :not_owned
   end
-  
+
   def daemonize
     exit if fork
     Process.setsid
     exit if fork
     Dir.chdir "/"
   end
-  
+
   def suppress_output
     $stderr.reopen('/dev/null', 'a')
     $stdout.reopen($stderr)
   end
-  
+
   def trap_signals
     trap(:QUIT) do   # graceful shutdown of run! loop
       @quit = true
     end
   end
-  
+
   def run!
     check_pid
     daemonize if daemonize?
@@ -97,12 +97,28 @@ class Server < Shota
     elsif daemonize?
       suppress_output
     end
-    
+    Thread.new do
+      while true
+        begin
+          while self.message_stack.size > 0
+            mess = self.message_stack.pop
+            self.bot.send_message(mess[0],mess[1]);
+            sleep 0.3
+          end
+        rescue
+          puts "shitmyself"
+        end
+      end
+    end
     while true
-      super
+      begin
+        super
+      rescue
+        puts "died here"
+      end
     end
   end
-  
+
   def redirect_output
     FileUtils.mkdir_p(File.dirname(logfile), :mode => 0755)
     FileUtils.touch logfile
@@ -111,5 +127,5 @@ class Server < Shota
     $stdout.reopen($stderr)
     $stdout.sync = $stderr.sync = true
   end
-  
+
 end

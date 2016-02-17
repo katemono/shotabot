@@ -6,18 +6,23 @@ require "open-uri"
 #require "net/https"
 
 class Shota
-  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm
-  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm
-  
+  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack
+  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack
+
   def initialize(options)
     @info = JSON.parse(File.open("config", "r").read)
     @bot = Discordrb::Bot.new @info["user"].chomp, @info["pass"].chomp
     @mimicked = []
     @pmers = []
     @watchedthreads = []
+    @message_stack = []
     @lastpm = 0
   end
-  
+
+  def send_messages(chanid,mess)
+    self.message_stack.push([chanid, mess])
+  end
+
   def run!
     self.bot.message(starting_with: "#{self.info["prefix"]}threaddump") do |event|
       drop_thread(event)
@@ -34,11 +39,11 @@ class Shota
     self.bot.message(starting_with: "#{self.info["prefix"]}danbooru") do |event|
       randomDanbooru(event)
     end
-    
+
     self.bot.message(starting_with: "#{self.info["prefix"]}yandere") do |event|
       randomYandere(event)
     end
-    
+
     self.bot.message(starting_with: "#{self.info["prefix"]}help") do |event|
       help(event)
     end
@@ -47,15 +52,15 @@ class Shota
       if event.author.permission?(:kick_members, event.server, event.channel)
         massmention(event)
       else
-        event.respond("You arent allowed to do that! >:c")
+        self.send_messages(event.channel.id,"You arent allowed to do that! >:c")
       end
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}masspm") do |event|
       if event.author.permission?(:kick_members, event.server, event.channel)
-        event.respond mass_pm(event)
+        self.send_messages(event.channel.id,mass_pm(event))
       else
-        event.respond("You arent allowed to do that! >:c")
+        self.send_messages(event.channel.id,"You arent allowed to do that! >:c")
       end
     end
 
@@ -63,52 +68,52 @@ class Shota
       if event.author.permission?(:kick_members, event.server, event.channel)
         mimic(event)
       else
-        event.respond("You arent allowed to do that! >:c")
+        self.send_messages(event.channel.id,"You arent allowed to do that! >:c")
       end
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}rape") do |event|
-      event.respond "_Holds down and cums inside #{event.message.mentions[0].mention}_"
+      self.send_messages(event.channel.id,"_Holds down and cums inside #{event.message.mentions[0].mention}_")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}triggered") do |event|
-      event.respond("http://i.imgur.com/wnIaRyJ.gif ,faggot")
+      self.send_messages(event.channel.id,"http://i.imgur.com/wnIaRyJ.gif ,faggot")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}retard") do |event|
-      event.respond "https://u.pomf.is/hfjsmj.gif"
+      self.send_messages(event.channel.id, "https://u.pomf.is/hfjsmj.gif")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}doit") do |event|
-      event.respond "https://u.pomf.is/bgqhef.gif"
+      self.send_messages(event.channel.id, "https://u.pomf.is/bgqhef.gif")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}cat") do |event|
-      event.respond randomCat
+      self.send_messages(event.channel.id, randomCat)
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}mrpython") do |event|
-      event.respond getrandompythons
+      self.send_messages(event.channel.id, getrandompythons)
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}coinflip") do |event|
-      event.respond coinflip
+      self.send_messages(event.channel.id, coinflip)
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}cute") do |event|
-      event.respond "https://u.pomf.is/fqbkom.png"
+      self.send_messages(event.channel.id, "https://u.pomf.is/fqbkom.png")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}love") do |event|
-      event.respond "https://www.youtube.com/watch?v=bI9hgp32-f0"
+      self.send_messages(event.channel.id, "https://www.youtube.com/watch?v=bI9hgp32-f0")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}caps") do |event|
-      event.respond "https://u.pomf.is/rkpzpj.jpg"
+      self.send_messages(event.channel.id, "https://u.pomf.is/rkpzpj.jpg")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}8ball") do |event|
-      event.respond z8ball
+      self.send_messages(event.channel.id, z8ball)
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}join") do |event|
@@ -118,37 +123,37 @@ class Shota
     self.bot.message(starting_with: "#{self.info["prefix"]}kick") do |event|
       if event.author.permission?(:kick_members, event.server, event.channel)
         event.server.kick(event.message.mentions[0])
-        event.respond("kicked #{event.message.mentions[0].id}")
+        self.send_messages(event.channel.id,"kicked #{event.message.mentions[0].id}")
       else
-        event.respond("You arent allowed to do that! >:c")
+        self.send_messages(event.channel.id,"You arent allowed to do that! >:c")
       end
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}id") do |event|
-      event.respond(event.message.mentions[0].id)
+      self.send_messages(event.channel.id,event.message.mentions[0].id)
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}unban") do |event|
       if event.author.permission?(:ban_members, event.server, event.channel)
         id = ((event.text).sub "#{self.info["prefix"]}unban ", "").to_i
         event.server.unban(self.bot.user(id))
-        event.respond("unbaned #{id}")
+        self.send_messages(event.channel.id,"unbaned #{id}")
       else
-        event.respond("You arent allowed to do that! >:c")
+        self.send_messages(event.channel.id,"You arent allowed to do that! >:c")
       end
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}ban") do |event|
       if event.author.permission?(:ban_members, event.server, event.channel)
         event.server.ban(event.message.mentions[0])
-        event.respond("banned #{event.message.mentions[0].id}")
+        self.send_messages(event.channel.id,"banned #{event.message.mentions[0].id}")
       else
-        event.respond("You arent allowed to do that! >:c")
+        self.send_messages(event.channel.id,"You arent allowed to do that! >:c")
       end
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}avatar") do |event|
-      event.respond event.message.mentions[0].avatar_url
+      self.send_messages(event.channel.id, event.message.mentions[0].avatar_url)
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}pmmentions") do |event|
@@ -160,15 +165,16 @@ class Shota
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}murderer") do |event|
-      event.send_message("_throws red paint on #{event.message.mentions[0].mention}_ \n https://www.youtube.com/watch?v=2w7TCmJUD7g");
+      #chanid,mess
+      self.send_messages(event.channel.id,"_throws red paint on #{event.message.mentions[0].mention}_ \n https://www.youtube.com/watch?v=2w7TCmJUD7g");
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}about") do |event|
-      event.respond "My owner is #{self.info["owner"]} their website is #{self.info["owners_site"]} you can find my source at https://github.com/katemono/shotabot"
+      self.send_messages(event.channel.id, "My owner is #{self.info["owner"]} their website is #{self.info["owners_site"]} you can find my source at https://github.com/katemono/shotabot")
     end
 
     self.bot.message(containing: ["(╯°□°）╯︵ ┻━┻", "(╯°□°）╯︵ ┻━━┻", "┻━┻︵ノ(°□°ノ）"]) do |event|
-      event.respond("┬─┬ノ( º _ ºノ) careful with the tables please")
+      self.send_messages(event.channel.id,"┬─┬ノ( º _ ºノ) careful with the tables please")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}throw") do |event|
@@ -187,45 +193,48 @@ class Shota
       "trumpet",
       "guitar"
       ]
-      event.respond("_throws a #{items.sample} at #{event.message.mentions[0].mention}_")
+      self.send_messages(event.channel.id,"_throws a #{items.sample} at #{event.message.mentions[0].mention}_")
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}cuddle") do |event|
-      event.respond("_picks up saiky and sets them in #{event.message.author.mention}'s lap_")
+      self.send_messages(event.channel.id,"_picks up saiky and sets them in #{event.message.author.mention}'s lap_")
     end
 
     self.bot.message(containing: ["┬─┬﻿ ノ( ゜-゜ノ)","┬─┬ノ( º _ ºノ)", "┬───────────────┬﻿ ノ( ゜- ゜ノ)", "┬─────────────┬ ノ(^-^ノ)"]) do |event|
-      event.respond(" (ﾉಥ益ಥ）ﾉ﻿ ┻━━━━━━━━━━━━━━┻ ")
+      self.send_messages(event.channel.id," (ﾉಥ益ಥ）ﾉ﻿ ┻━━━━━━━━━━━━━━┻ ")
     end
-    
+
     self.bot.message(containing: "boot") do |event|
       unless event.channel.id == 110373943822540800
-        event.respond("https://u.pomf.is/awgpeo.jpg")
+        self.send_messages(event.channel.id,"https://u.pomf.is/awgpeo.jpg")
       end
     end
-    
+
     self.bot.message(containing: ["short","shirt"]) do |event|
       unless event.channel.id == 110373943822540800
-        event.respond("https://u.pomf.is/gzfkxn.jpg")
+        self.send_messages(event.channel.id,"https://u.pomf.is/gzfkxn.jpg")
       end
     end
-    
+
     self.bot.message(containing: "dad") do |event|
       unless event.channel.id == 110373943822540800
-        event.respond("Just me and my :two_hearts:daddy:two_hearts:, hanging out I got pretty hungry:eggplant: so I started to pout :disappointed: He asked if I was down :arrow_down:for something yummy :heart_eyes::eggplant: and I asked what and he said he'd give me his :sweat_drops:cummies!:sweat_drops: Yeah! Yeah!:two_hearts::sweat_drops: I drink them!:sweat_drops: I slurp them!:sweat_drops: I swallow them whole:sweat_drops: :heart_eyes: It makes :cupid:daddy:cupid: :blush:happy:blush: so it's my only goal... :two_hearts::sweat_drops::tired_face:Harder daddy! Harder daddy! :tired_face::sweat_drops::two_hearts: 1 cummy:sweat_drops:, 2 cummy:sweat_drops::sweat_drops:, 3 cummy:sweat_drops::sweat_drops::sweat_drops:, 4:sweat_drops::sweat_drops::sweat_drops::sweat_drops: I'm :cupid:daddy's:cupid: :crown:princess :crown:but I'm also a whore! :heart_decoration: He makes me feel squishy:heartpulse:!He makes me feel good:purple_heart:! :cupid::cupid::cupid:He makes me feel everything a little should!~ :cupid::cupid::cupid: :crown::sweat_drops::cupid:Wa-What!:cupid::sweat_drops::crown:")
+        self.send_messages(event.channel.id,"Just me and my :two_hearts:daddy:two_hearts:, hanging out I got pretty hungry:eggplant: so I started to pout :disappointed: He asked if I was down :arrow_down:for something yummy :heart_eyes::eggplant: and I asked what and he said he'd give me his :sweat_drops:cummies!:sweat_drops: Yeah! Yeah!:two_hearts::sweat_drops: I drink them!:sweat_drops: I slurp them!:sweat_drops: I swallow them whole:sweat_drops: :heart_eyes: It makes :cupid:daddy:cupid: :blush:happy:blush: so it's my only goal... :two_hearts::sweat_drops::tired_face:Harder daddy! Harder daddy! :tired_face::sweat_drops::two_hearts: 1 cummy:sweat_drops:, 2 cummy:sweat_drops::sweat_drops:, 3 cummy:sweat_drops::sweat_drops::sweat_drops:, 4:sweat_drops::sweat_drops::sweat_drops::sweat_drops: I'm :cupid:daddy's:cupid: :crown:princess :crown:but I'm also a whore! :heart_decoration: He makes me feel squishy:heartpulse:!He makes me feel good:purple_heart:! :cupid::cupid::cupid:He makes me feel everything a little should!~ :cupid::cupid::cupid: :crown::sweat_drops::cupid:Wa-What!:cupid::sweat_drops::crown:")
       end
     end
-    
+
     #self.bot.message(containing: "lmao") do |event|
     #  sleep 1
-    #  event.respond("ayy")
+    #  self.send_messages(event.channel.id,"ayy")
     #end
-    
+
     self.bot.message(starting_with: "#{self.info["prefix"]}cummies") do |event|
       atscummies(event)
     end
-    
+
     self.bot.private_message() do |event|
+      if event.text.start_with? "#{self.info["prefix"]}join" or event.text.include? "https://discord.gg/"
+        self.bot.join(event.text.sub("#{self.info["prefix"]}join ", ''))
+      end
       unless self.lastpm == event.message.author.id
         self.lastpm = event.message.author.id
         help(event)
@@ -255,12 +264,12 @@ class Shota
 
   def imgtfy(event)
     text = URI.escape(URI.escape(event.text.sub("#{self.info["prefix"]}lmgtfy ", '')), "+");
-    event.respond "http://lmgtfy.com/?q=#{text}"
+    self.send_messages(event.channel.id, "http://lmgtfy.com/?q=#{text}")
   end
 
   def help(event)
-    usercmds = 
-    { 
+    usercmds =
+    {
     "danbooru"  => "[tags]\n\tReturns random image based on tags from danbooru",
     "gelbooru"  => "[tags]\n\tReturns random image based on tags from gelbooru",
     "yandere"  => "[tags]\n\tReturns random image based on tags from yandere",
@@ -311,7 +320,7 @@ class Shota
   end
 
   def mimic(event)
-    begin 
+    begin
       id = event.message.mentions[0].id
       if $mimicked.include? id
         $mimicked-=[id]
@@ -319,9 +328,9 @@ class Shota
         $mimicked.push(id)
       end
     rescue
-      event.respond "Please provide valid user in form of @ mention"
+      self.send_messages(event.channel.id, "Please provide valid user in form of @ mention")
     end
-    event.respond "ok"
+    self.send_messages(event.channel.id, "ok")
   end
 
   def returnstaff(event)
@@ -329,7 +338,7 @@ class Shota
     for user in event.channel.users do
      message+="\t- "+user.name+"\n" if user.permission?(:kick_members, event.server, event.channel) && user.bot? != true
     end
-    event.send_message(message);
+    self.send_messages(event.channel.id,message);
   end
 
   def z8ball
@@ -361,16 +370,16 @@ class Shota
     url = url.chomp.lstrip
     html_doc = Nokogiri::HTML(agent.get(url).body)
     files=[]
-    if /:\/\/boards\.4chan\.org/.match(url) 
+    if /:\/\/boards\.4chan\.org/.match(url)
       (html_doc.css('div.file')).each{ |ito| files.push "https:#{ito.css("a")[0]['href']}"}
-    elsif /:\/\/7chan\.org/.match(url) 
+    elsif /:\/\/7chan\.org/.match(url)
       (html_doc.css('p.file_size')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
-    elsif /:\/\/boards\.420chan\.org/.match(url) 
+    elsif /:\/\/boards\.420chan\.org/.match(url)
       (html_doc.css('span.filesize')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
-    else 
+    else
       (html_doc.css('p.fileinfo')).each{ |ito| files.push "#{ito.css("a")[0]['href']}"}
     end
-  
+
     retarr = []
     prefix = (url.split '/')[0..-4].join '/'
     if prefix.include? "420chan.org" or prefix.include? "8ch.net"
@@ -383,7 +392,7 @@ class Shota
       end
       files = retarr
     end
-  
+
     return files
   end
 
@@ -403,14 +412,14 @@ class Shota
     messages = []
     for x in items do
       if message.length <= 1000 then
-        message+=x+" " 
+        message+=x+" "
       else
         messages.push(message)
         message=x+" "
       end
     end
     messages.push(message) unless messages.include? message or message == ""
-    messages.each do|x| 
+    messages.each do|x|
       if pm == true
         event.pm x
       else
@@ -429,7 +438,7 @@ class Shota
     handlemessages(threadx,author,pm = true)
     return newthread
   end
-  
+
   def drop_thread(event)
     files=scrapthread(event.text.sub("#{self.info["prefix"]}threaddump", ''))
     handlemessages(files,event)
@@ -440,19 +449,19 @@ class Shota
   end
 
   def mass_pm(event)
-    users = event.channel.users 
+    users = event.channel.users
     text = event.text.sub("#{self.info["prefix"]}masspm", '')
     for user in users do
       #spit out nasty error if you pm bot
       user.pm(text) unless user.bot?
-      sleep 0.1 
+      sleep 0.1
     end
     return "Done!"
   end
-  
+
   def atscummies(event)
     user = event.message.mentions[0].mention
-    event.respond("Just me and my :two_hearts:#{user}:two_hearts:, hanging out I got pretty hungry:eggplant: so I started to pout :disappointed: He asked if I was down :arrow_down:for something yummy :heart_eyes::eggplant: and I asked what and he said he'd give me his :sweat_drops:cummies!:sweat_drops: Yeah! Yeah!:two_hearts::sweat_drops: I drink them!:sweat_drops: I slurp them!:sweat_drops: I swallow them whole:sweat_drops: :heart_eyes: It makes :cupid:#{user}:cupid: :blush:happy:blush: so it's my only goal... :two_hearts::sweat_drops::tired_face:Harder #{user}! Harder #{user}! :tired_face::sweat_drops::two_hearts: 1 cummy:sweat_drops:, 2 cummy:sweat_drops::sweat_drops:, 3 cummy:sweat_drops::sweat_drops::sweat_drops:, 4:sweat_drops::sweat_drops::sweat_drops::sweat_drops: I'm :cupid:#{user}'s:cupid: :crown:princess :crown:but I'm also a whore! :heart_decoration: He makes me feel squishy:heartpulse:!He makes me feel good:purple_heart:! :cupid::cupid::cupid:He makes me feel everything a little should!~ :cupid::cupid::cupid: :crown::sweat_drops::cupid:Wa-What!:cupid::sweat_drops::crown:")
+    self.send_messages(event.channel.id,"Just me and my :two_hearts:#{user}:two_hearts:, hanging out I got pretty hungry:eggplant: so I started to pout :disappointed: He asked if I was down :arrow_down:for something yummy :heart_eyes::eggplant: and I asked what and he said he'd give me his :sweat_drops:cummies!:sweat_drops: Yeah! Yeah!:two_hearts::sweat_drops: I drink them!:sweat_drops: I slurp them!:sweat_drops: I swallow them whole:sweat_drops: :heart_eyes: It makes :cupid:#{user}:cupid: :blush:happy:blush: so it's my only goal... :two_hearts::sweat_drops::tired_face:Harder #{user}! Harder #{user}! :tired_face::sweat_drops::two_hearts: 1 cummy:sweat_drops:, 2 cummy:sweat_drops::sweat_drops:, 3 cummy:sweat_drops::sweat_drops::sweat_drops:, 4:sweat_drops::sweat_drops::sweat_drops::sweat_drops: I'm :cupid:#{user}'s:cupid: :crown:princess :crown:but I'm also a whore! :heart_decoration: He makes me feel squishy:heartpulse:!He makes me feel good:purple_heart:! :cupid::cupid::cupid:He makes me feel everything a little should!~ :cupid::cupid::cupid: :crown::sweat_drops::cupid:Wa-What!:cupid::sweat_drops::crown:")
   end
 
   def massmention(event)
@@ -460,18 +469,18 @@ class Shota
     messages = []
     for user in event.channel.users do
       if message.length <= 1000
-        message+="#{user.mention} " 
+        message+="#{user.mention} "
       else
         messages.push(message)
         message="#{user.mention} "
       end
     end
     messages.push(message) unless messages.include? message
-    messages.each do|x| 
-      event.send_message(x)
+    messages.each do|x|
+      self.send_messages(event.channel.id,x)
       sleep 0.1
     end
-    event.respond event.text.sub("#{self.info["prefix"]}massmention","")
+    self.send_messages(event.channel.id, event.text.sub("#{self.info["prefix"]}massmention",""))
   end
 
   def randomGelbooru(event)
@@ -482,20 +491,20 @@ class Shota
     #tag= (event.text.sub("#{self.info["prefix"]}yandere","").split).join("+")
     agent = Mechanize.new { |agent| agent.user_agent_alias = "Mac Safari" }
     html_doc = agent.get(url)
-    event.respond JSON.parse(html_doc.body).sample["file_url"]
+    self.send_messages(event.channel.id, JSON.parse(html_doc.body).sample["file_url"])
   end
 
   def randomYandere(event)
     tag= (event.text.sub("#{self.info["prefix"]}yandere","").split).join("+")
     agent = Mechanize.new { |agent| agent.user_agent_alias = "Mac Safari" }
     html_doc = agent.get("https://yande.re/post.json?limit=200&tags="+tag)
-    event.respond JSON.parse(html_doc.body).sample["file_url"]
+    self.send_messages(event.channel.id, JSON.parse(html_doc.body).sample["file_url"])
   end
-  
+
   def randomDanbooru(event)
     tag = event.text.sub("#{self.info["prefix"]}danbooru","")
     url="http://danbooru.donmai.us/posts.json?tags=#{((tag.split).join '+~')}"
-    event.respond "http://danbooru.donmai.us"+(JSON.parse(((URI.parse(url)).read)).sample["file_url"])
+    self.send_messages(event.channel.id, "http://danbooru.donmai.us"+(JSON.parse(((URI.parse(url)).read)).sample["file_url"]))
   end
 
   def randomCat
