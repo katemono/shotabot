@@ -2,18 +2,20 @@ require 'discordrb'
 require "mechanize"
 require "nokogiri"
 require "uri"
+require "youtube-dl"
 require "open-uri"
 #require "net/https"
 
 class Shota
-  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack
-  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack
+  attr_reader :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack, :songs
+  attr_writer :bot,:info, :mimicked, :pmers, :watchedthreads, :lastpm, :message_stack, :songs
 
   def initialize(options)
     @info = JSON.parse(File.open("config", "r").read)
     @bot = Discordrb::Bot.new @info["user"].chomp, @info["pass"].chomp
     @mimicked = []
     @pmers = []
+    @songs = []
     @watchedthreads = []
     @message_stack = []
     @lastpm = 0
@@ -24,6 +26,24 @@ class Shota
   end
 
   def run!
+    self.bot.message(starting_with: "#{self.info["prefix"]}joinchan") do |event|
+      event.server.channels.each do |chan|
+        self.bot.voice_connect(chan) if chan.name == event.text.sub("#{self.info["prefix"]}joinchan ", '')
+      end
+    end
+
+    self.bot.message(starting_with: "#{self.info["prefix"]}play") do |event|
+      options = {
+        extract_audio: true,
+        audio_format: 'mp3',
+        output: "%(title)s.mp3"
+      }
+
+      filename = (YoutubeDL.download event.text.sub("#{self.info["prefix"]}play ", ''), options).filename
+      self.songs.push filename
+      puts self.songs 
+    end
+
     self.bot.message(starting_with: "#{self.info["prefix"]}threaddump") do |event|
       drop_thread(event)
     end

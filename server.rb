@@ -100,6 +100,20 @@ class Server < Shota
     Thread.new do
       while true
         begin
+          puts "here"
+          while self.songs.size > 0
+            puts "here1"
+            song = self.songs.pop
+            self.bot.voice.play_file("./"+song)
+          end
+        rescue
+          puts "shitmyself"
+        end
+      end
+    end
+    Thread.new do
+      while true
+        begin
           while self.message_stack.size > 0
             mess = self.message_stack.pop
             self.bot.send_message(mess[0],mess[1]);
