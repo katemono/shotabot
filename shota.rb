@@ -70,7 +70,7 @@ class Shota
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}massmention") do |event|
-      if event.author.permission?(:kick_members, event.server, event.channel)
+      if event.author.permission?(:kick_members, event.server, event.channel) or event.author.id == 101808947706482688
         massmention(event)
       else
         self.send_messages(event.channel.id,"You arent allowed to do that! >:c")
@@ -78,7 +78,7 @@ class Shota
     end
 
     self.bot.message(starting_with: "#{self.info["prefix"]}masspm") do |event|
-      if event.author.permission?(:kick_members, event.server, event.channel)
+      if event.author.permission?(:kick_members, event.server, event.channel) or event.author.id == 101808947706482688
         self.send_messages(event.channel.id,mass_pm(event))
       else
         self.send_messages(event.channel.id,"You arent allowed to do that! >:c")

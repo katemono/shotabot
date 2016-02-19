@@ -101,6 +101,10 @@ class Server < Shota
       while true
         #begin
           #puts "here"
+          if self.vbot != nil
+            puts "here"
+            self.vbot.play_dca(open("/Users/normie/Downloads/sine.dca"))
+          end
           while self.songs.size > 0
             puts "here1"
             song = self.songs.pop
